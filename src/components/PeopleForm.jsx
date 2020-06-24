@@ -2,16 +2,18 @@ import React, {useEffect, useState} from 'react';
 import Input from "./common/Input";
 import Button from './common/Button';
 import {nanoid} from "nanoid";
-
+import { getAllPeople } from '../store/selectors/people';
+import { addPerson, editPerson } from '../store/actions/people';
+import { connect } from 'react-redux'
 
 import {peopleColumns} from "../services/peopleService";
 
-const initialPersonData = peopleColumns.reduce((columns, columnName) => {
+const initialPersonData = peopleColumns.reduce((columns, columnName, ) => {
     columns[columnName] = '';
     return columns;
 }, {})
 
-const PeopleForm = ({setPeople, people, history, match}) => {
+const PeopleForm = ({setPeople, people, history, match, dispatchAddPerson, dispatchEditPerson}) => {
     const [formErrors, setFormErrors] = useState({});
     const [personData, setPersonData] = useState({...initialPersonData});
     const [editMode, setEditMode] = useState(false);
@@ -22,7 +24,7 @@ const PeopleForm = ({setPeople, people, history, match}) => {
         const existingPersonData = people.find(person => person.id === personId)
         setPersonData(existingPersonData)
         setEditMode(true);
-    }, [])
+    }, [match.params.id, people])
 
     const validate = (data) => { // super simple validation
         let errors = {};
@@ -34,7 +36,12 @@ const PeopleForm = ({setPeople, people, history, match}) => {
         setFormErrors(errors);
         return errors
     }
-
+    const handleEditPerson = id => {
+        dispatchEditPerson(id);
+    }
+    const handleAddPerson = item => {
+        dispatchEditPerson(item);
+    }
     const onSubmit = (event) => {
         event.preventDefault();
         const errors = validate(personData);
@@ -44,10 +51,9 @@ const PeopleForm = ({setPeople, people, history, match}) => {
         }
 
         if (editMode) {
-            const newPeopleList = people.map(person => person.id === personData.id ? personData : person);
-            setPeople(newPeopleList)
+            handleEditPerson(personData);
         } else {
-            setPeople( people, {...personData, beloved: false, id: nanoid()});
+            handleAddPerson({...personData, beloved: false, id: nanoid()})
         }
         history.push('/')
     }
@@ -88,4 +94,21 @@ const PeopleForm = ({setPeople, people, history, match}) => {
     );
 };
 
-export default PeopleForm;
+const mapStateToProps = state => {
+    return {
+        people: getAllPeople(state)
+    };
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        dispatchEditPerson: data => {
+            dispatch(editPerson(data));
+        },
+        dispatchAddPerson: data => {
+            dispatch(editPerson(data));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PeopleForm);

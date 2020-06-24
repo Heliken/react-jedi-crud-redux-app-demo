@@ -33,15 +33,14 @@ function App() {
         }
 
         fetchData()
-    }, [])
+    }, [dispatch])
 
     return (
         <>
             <Navbar/>
             <main className="container">
                 <Switch>
-                    <Route path="/people/:id" render={props =>
-                        <PeopleForm {...props}  />}/>
+                    <Route path="/people/:id" render={props => <PeopleForm {...props}  />}/>
                     <Route path="/people" render={props => <PeoplePage {...props} />} />
                     {/*<Route path="/planets/:id" component={Form}/>*/}
                     <Route path="/planets" component={PlanetsPage}/>

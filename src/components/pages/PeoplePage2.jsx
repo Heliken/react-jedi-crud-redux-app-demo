@@ -6,7 +6,6 @@ import { deletePerson, changeBelovedStatus } from '../../store/actions/people';
 import { connect } from 'react-redux'
 
 const PeoplePage = ({people, dispatchDeletePerson, dispatchChangeBelovedStatus}) => {
-    
     const handleBelovedStatus = id => {
         dispatchChangeBelovedStatus(id);
     }
